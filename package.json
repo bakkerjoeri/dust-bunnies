@@ -1,6 +1,10 @@
 {
-  "name": "svelte-app",
-  "version": "1.0.0",
+  "name": "dust-bunnies",
+  "version": "0.0.0",
+  "author": "Joeri Bakker <bakkerjoeri@gmail.com>",
+  "repository": {
+    "url": "https://github.com/bakkerjoeri/dust-bunnies"
+  },
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
@@ -21,9 +25,7 @@
     "@rollup/plugin-typescript": "^6.0.0",
     "typescript": "^3.9.3",
     "tslib": "^2.0.0",
-    "@tsconfig/svelte": "^1.0.0"
-  },
-  "dependencies": {
-    "sirv-cli": "^1.0.0"
+    "@tsconfig/svelte": "^1.0.0",
+    "sirv-cli": "^1.0.11"
   }
 }
