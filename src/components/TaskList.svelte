@@ -1,25 +1,20 @@
 <script lang="ts">
-	import { taskBeingEdited, taskWithFocus } from "../store/tasks";
+	import { Task } from "../store/tasks";
 	import TaskItem from "./TaskItem.svelte";
-	import type { Task } from "../store/tasks";
-	
-	export let tasks: Task[] = [];
+
+	export let tasks: Task[];
 </script>
 
-<ul class="TaskList">
-	{#each tasks as task (task.id)}
+<ul>
+	{#each tasks as task}
 		<li>
-			<TaskItem
-				task={task}
-				hasFocus={$taskWithFocus === task}
-				isEditing={$taskBeingEdited === task}
-			/>
+			<TaskItem {task} />
 		</li>
 	{/each}
 </ul>
 
-<style lang="scss">
-	.TaskList {
+<style>
+	ul {
 		list-style: none;
 	}
 </style>

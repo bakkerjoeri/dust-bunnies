@@ -1,108 +1,58 @@
-import { writable, derived, get } from 'svelte/store';
-import uuid from '../utilities/uuid';
-import { createLocalStore } from './localStore';
-
-type DisplayMode = 'all' | 'remaining' | 'available' | 'nextUp';
+import uuid from "@bakkerjoeri/uuid";
+import { derived, writable } from "svelte/store";
+import { collectionStore } from "./collectionStore";
+import { localStore } from "./localStore";
 
 export interface Task {
-	id: string,
+	id: string;
 	title: string;
-	isDone: boolean;
-	subTasks: Task[]
+	notes: string;
+	subtaskIds: Task["id"][];
+	status: "inProgress" | "done" | "dropped";
+	deferType: "none" | "date" | "someday";
+	deferredTo: null | number;
+	due: null | number;
+	createdAt: number;
+	doneAt: null | number;
+	droppedAt: null | number;
 }
 
-export function createEmptyTask(): Task {
+export function createTask(value: Partial<Task> = {}): Task {
 	return {
 		id: uuid(),
-		title: '',
-		isDone: false,
-		subTasks: [],
+		title: "",
+		notes: "",
+		subtaskIds: [],
+		status: "inProgress",
+		deferType: "none",
+		deferredTo: null,
+		due: null,
+		createdAt: Date.now().valueOf(),
+		doneAt: null,
+		droppedAt: null,
+		...value,
 	};
 }
 
-let mockTasks: Task[] = [
-	{
-		id: '1',
-		title: 'My first task',
-		isDone: false,
-		subTasks: [],
-	},
-	{
-		id: '2',
-		title: 'My second task',
-		isDone: false,
-		subTasks: [
-			{
-				id: '3',
-				title: 'Here is a subtask',
-				isDone: false,
-				subTasks: [],
-			},
-			{
-				id: '4',
-				title: 'And another',
-				isDone: false,
-				subTasks: [],
-			}
-		],
+export const tasks = collectionStore(localStore<Task[]>("tasks", writable([])));
+export const rootTaskIds = localStore<Task["id"][]>(
+	"rootTaskIds",
+	writable([])
+);
+export const rootTasks = derived(
+	[rootTaskIds, tasks],
+	([rootTaskIds, tasks]) => {
+		return rootTaskIds.map((id) => tasks.find((task) => task.id === id));
 	}
-];
-
-function createTaskStore() {
-	const { subscribe, set, update } = createLocalStore<Task[]>('tasks', []);
-	// const { subscribe, set, update } = writable(mockTasks);
-
-	return {
-		subscribe,
-		set,
-		update,
-		patch(id: Task['id'], newData: Partial<Task>): void {
-			update(tasks => {
-				return tasks.map(task => {
-					if (task.id === id) {
-						return { ...task, ...newData };
-					}
-	
-					return task;
-				});
-			});
-		},
-		addTask: (task: Task): void => {
-			update(tasks => {
-				return [
-					...tasks,
-					task,
-				];
-			});
-		},
-		insertTask: (task: Task, index: number): void => {
-			update(tasks => {
-				return [
-					...tasks.slice(0, index),
-					task,
-					...tasks.slice(index),
-				]
-			});
-		},
-		deleteTask: (id: Task['id']): void => {
-			update(tasks => tasks.filter(task => task.id !== id));
-		}
-	}
-}
-
-export const tasks = createTaskStore();
-export const taskWithFocus = writable<Task | null>(null);
-export const taskBeingEdited = writable<Task | null>(null);
-export const displayMode = writable<DisplayMode>('all');
-export const visibleTasks = derived(
-	[tasks, displayMode],
-	([$tasks, $displayMode]) => $tasks.filter(task => isTaskVisible(task, $displayMode))
 );
 
-function isTaskVisible(task: Task, displayMode: DisplayMode) {
-	if (displayMode === 'remaining') {
-		return !task.isDone;
-	}
+export const inbox = derived([rootTasks], ([rootTasks]) => {
+	return rootTasks.filter((task) => {
+		const isTaskInProgress = task.status === "inProgress";
+		const isTaskUndeferred =
+			task.deferType === "none" ||
+			(task.deferType === "date" && task.deferredTo === null);
 
-	return true;
-}
+		return isTaskInProgress && isTaskUndeferred;
+	});
+});
