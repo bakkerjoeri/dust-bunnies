@@ -26,7 +26,14 @@
 	}
 
 	function saveChangesToTitle() {
-		tasks.patch(task.id, { title: titleDraft });
+		updateTask("title", titleDraft);
+	}
+
+	function updateTask<TKey extends keyof Task>(
+		key: TKey,
+		newValue: Task[TKey]
+	) {
+		tasks.patch(task.id, { [key]: newValue });
 	}
 
 	function select() {
@@ -49,6 +56,14 @@
 		titleDraft = task.title;
 	}
 
+	function onChangeCheckbox(event: any) {
+		if (event.target.checked) {
+			updateTask("status", "done");
+		} else {
+			updateTask("status", "inProgress");
+		}
+	}
+
 	function onSubmitTitleForm() {
 		saveChangesToTitle();
 		stopEditing();
@@ -68,20 +83,48 @@
 		}
 
 		if (
-			isSelected &&
-			!isEditing &&
 			event.key === "Enter" &&
-			event.metaKey
+			event.metaKey &&
+			isSelected &&
+			!isEditing
 		) {
 			event.preventDefault();
 			startEditing();
 			return;
 		}
 
-		if (isEditing && event.key === "Enter") {
+		if (event.key === "Enter" && isEditing) {
 			event.preventDefault();
 			saveChangesToTitle();
 			stopEditing();
+			return;
+		}
+
+		if (event.key === " " && !event.altKey && isSelected && !isEditing) {
+			event.preventDefault();
+
+			if (task.status === "done") {
+				updateTask("status", "inProgress");
+			} else {
+				updateTask("status", "done");
+			}
+
+			return;
+		}
+
+		if (
+			((event.key === " " && event.altKey) || event.key === " ") &&
+			isSelected &&
+			!isEditing
+		) {
+			event.preventDefault();
+
+			if (task.status === "dropped") {
+				updateTask("status", "inProgress");
+			} else {
+				updateTask("status", "dropped");
+			}
+
 			return;
 		}
 	}
@@ -128,6 +171,7 @@
 		type="checkbox"
 		checked={task.status === "done"}
 		indeterminate={task.status === "dropped"}
+		on:change={onChangeCheckbox}
 	/>
 
 	<div class="title" on:click={onClickTask}>
