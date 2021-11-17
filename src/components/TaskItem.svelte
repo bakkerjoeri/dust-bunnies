@@ -70,6 +70,15 @@
 	}
 
 	function onKeyDown(event: KeyboardEvent) {
+		var inputs = ["input", "select", "button", "textarea"];
+
+		if (
+			document.activeElement &&
+			inputs.includes(document.activeElement.tagName.toLowerCase())
+		) {
+			return;
+		}
+
 		if (event.key === "Escape" && isEditing) {
 			event.preventDefault();
 			stopEditing();
@@ -174,7 +183,11 @@
 		on:change={onChangeCheckbox}
 	/>
 
-	<div class="title" on:click={onClickTask}>
+	<div
+		class="title"
+		class:is-placeholder={task.title.length === 0}
+		on:click={onClickTask}
+	>
 		{#if isEditing}
 			<form on:submit={onSubmitTitleForm}>
 				<input
@@ -188,7 +201,7 @@
 				{#if task.title.length > 0}
 					{task.title}
 				{:else}
-					New task
+					<span class="placeholder">New task</span>
 				{/if}
 			</label>
 		{/if}
@@ -229,6 +242,10 @@
 	.title {
 		grid-column: 3 / 4;
 		line-height: 26px;
+	}
+
+	.placeholder {
+		opacity: 0.5;
 	}
 
 	.options {

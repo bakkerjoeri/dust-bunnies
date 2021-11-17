@@ -1,12 +1,13 @@
 {
-  "include": ["src", "types"],
-  "compilerOptions": {
-    "module": "esnext",
-    "target": "esnext",
-    "moduleResolution": "node",
-    "jsx": "preserve",
-    "baseUrl": "./",
-    "noEmit": true,
-    "allowJs": true
-  }
+	"include": ["src", "types"],
+	"compilerOptions": {
+		"module": "esnext",
+		"target": "esnext",
+		"moduleResolution": "node",
+		"jsx": "preserve",
+		"baseUrl": "./",
+		"noEmit": true,
+		"allowJs": true,
+		"allowSyntheticDefaultImports": true
+	}
 }

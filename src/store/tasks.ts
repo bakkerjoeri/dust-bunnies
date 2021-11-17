@@ -1,13 +1,18 @@
 import uuid from "@bakkerjoeri/uuid";
+import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { derived, writable } from "svelte/store";
 import { collectionStore } from "./collectionStore";
 import { localStore } from "./localStore";
 import type { Readable } from "svelte/store";
 
+dayjs.extend(isSameOrBefore);
+
 export interface Task {
 	id: string;
 	title: string;
 	notes: string;
+	tags: string[];
 	subtaskIds: Task["id"][];
 	status: "inProgress" | "done" | "dropped";
 	deferType: "none" | "date" | "someday";
@@ -23,6 +28,7 @@ export function createTask(value: Partial<Task> = {}): Task {
 		id: uuid(),
 		title: "",
 		notes: "",
+		tags: [],
 		subtaskIds: [],
 		status: "inProgress",
 		deferType: "none",
@@ -67,5 +73,31 @@ export const inbox = derived([rootTasks], ([rootTasks]) => {
 			(task.deferType === "date" && task.deferredTo === null);
 
 		return isTaskInProgress && isTaskUndeferred;
+	});
+});
+
+export const tasksForToday = derived([rootTasks], ([rootTasks]) => {
+	return rootTasks.filter((task) => {
+		const isTaskInProgress = task.status === "inProgress";
+		const isTaskDeferredToToday =
+			task.deferType === "date" &&
+			task.deferredTo !== null &&
+			dayjs(task.deferredTo).isSameOrBefore(dayjs(new Date(), "day"));
+
+		const isTaskDueToday =
+			task.due !== null &&
+			dayjs(task.due).isSameOrBefore(dayjs(new Date(), "day"));
+
+		return isTaskInProgress && (isTaskDeferredToToday || isTaskDueToday);
+	});
+});
+
+export const tasksForSomeday = derived([rootTasks], ([rootTasks]) => {
+	return rootTasks.filter((task) => task.deferType === "someday");
+});
+
+export const tasksInLogbook = derived([rootTasks], ([rootTasks]) => {
+	return rootTasks.filter((task) => {
+		return task.status === "done" || task.status === "dropped";
 	});
 });
