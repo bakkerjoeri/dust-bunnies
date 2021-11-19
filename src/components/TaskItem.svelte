@@ -1,5 +1,12 @@
 <script lang="ts">
-	import { createTask, selectedTaskId, Task, tasks } from "./../store/tasks";
+	import {
+		addSubtask,
+		createTask,
+		patchTask,
+		selectedTaskId,
+		Task,
+		tasks,
+	} from "./../store/tasks";
 	import TaskList from "./TaskList.svelte";
 
 	export let task: Task;
@@ -26,14 +33,7 @@
 	}
 
 	function saveChangesToTitle() {
-		updateTask("title", titleDraft);
-	}
-
-	function updateTask<TKey extends keyof Task>(
-		key: TKey,
-		newValue: Task[TKey]
-	) {
-		tasks.patch(task.id, { [key]: newValue });
+		patchTask(task.id, { title: titleDraft });
 	}
 
 	function select() {
@@ -58,9 +58,9 @@
 
 	function onChangeCheckbox(event: any) {
 		if (event.target.checked) {
-			updateTask("status", "done");
+			patchTask(task.id, { status: "done" });
 		} else {
-			updateTask("status", "inProgress");
+			patchTask(task.id, { status: "inProgress" });
 		}
 	}
 
@@ -113,9 +113,9 @@
 			event.preventDefault();
 
 			if (task.status === "done") {
-				updateTask("status", "inProgress");
+				patchTask(task.id, { status: "inProgress" });
 			} else {
-				updateTask("status", "done");
+				patchTask(task.id, { status: "done" });
 			}
 
 			return;
@@ -129,9 +129,9 @@
 			event.preventDefault();
 
 			if (task.status === "dropped") {
-				updateTask("status", "inProgress");
+				patchTask(task.id, { status: "inProgress" });
 			} else {
-				updateTask("status", "dropped");
+				patchTask(task.id, { status: "dropped" });
 			}
 
 			return;
@@ -149,9 +149,7 @@
 	function onClickAddSubtask() {
 		const newTask = createTask();
 		tasks.add(newTask);
-		tasks.patch(task.id, {
-			subtaskIds: [...task.subtaskIds, newTask.id],
-		});
+		addSubtask(task.id, newTask.id);
 	}
 
 	function toggleSubtaskVisibility() {
@@ -209,6 +207,20 @@
 
 	<div class="options">
 		<button on:click={onClickAddSubtask}>Add subtask</button>
+
+		{#if !task.isInTrash}
+			<button
+				on:click={() => {
+					patchTask(task.id, { isInTrash: true });
+				}}>Move to trash</button
+			>
+		{:else}
+			<button
+				on:click={() => {
+					patchTask(task.id, { isInTrash: false });
+				}}>Put back</button
+			>
+		{/if}
 	</div>
 </div>
 
@@ -237,6 +249,8 @@
 	input[type="checkbox"] {
 		grid-column: 2 / 3;
 		justify-self: center;
+		align-self: baseline;
+		height: var(--baseline);
 	}
 
 	.title {

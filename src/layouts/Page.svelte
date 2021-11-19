@@ -6,6 +6,8 @@
 		tasks,
 		selectedTask,
 		selectedTaskId,
+		tasksInTrash,
+		patchTask,
 	} from "../store/tasks";
 	import { link } from "svelte-routing";
 
@@ -36,6 +38,12 @@
 			<li>
 				<a href="/logbook" use:link>Logbook</a>
 			</li>
+
+			{#if $tasksInTrash.length > 0}
+				<li>
+					<a href="/trash" use:link>Trash</a>
+				</li>
+			{/if}
 		</ul>
 	</nav>
 	<header>
@@ -52,7 +60,7 @@
 				title={$selectedTask.title}
 				on:save={({ detail: newValue }) => {
 					console.log("Saving...", $selectedTask.id, newValue);
-					tasks.patch($selectedTask.id, newValue);
+					patchTask($selectedTask.id, newValue);
 				}}
 			/>
 		</aside>
