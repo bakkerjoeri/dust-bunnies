@@ -58,6 +58,11 @@
 		<aside>
 			<TaskForm
 				title={$selectedTask.title}
+				notes={$selectedTask.notes}
+				tags={$selectedTask.tags}
+				status={$selectedTask.status}
+				deferType={$selectedTask.deferType}
+				deferredTo={$selectedTask.deferredTo}
 				on:save={({ detail: newValue }) => {
 					console.log("Saving...", $selectedTask.id, newValue);
 					patchTask($selectedTask.id, newValue);
