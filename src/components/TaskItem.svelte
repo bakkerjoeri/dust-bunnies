@@ -1,140 +1,295 @@
 <script lang="ts">
-	import { caretRight, caretDown } from 'svelte-awesome/icons';
-	import { tick } from "svelte";
-	import Icon from 'svelte-awesome';
+	import { when } from "../utilities/dates";
+
+	import {
+		addSubtask,
+		createTask,
+		patchTask,
+		selectedTaskId,
+		Task,
+		tasks,
+	} from "./../store/tasks";
 	import TaskList from "./TaskList.svelte";
-	import  { taskBeingEdited, tasks, taskWithFocus } from "./../store/tasks";
-	import type { Task } from "./../store/tasks";
 
 	export let task: Task;
-	export let hasFocus: boolean;
-	export let isEditing: boolean;
 
-	$: {
-		if (isEditing) {
-			focus();
+	let areSubtasksVisible = false;
+	let isEditing = false;
+	let titleDraft = "";
+	let titleInput: HTMLInputElement;
+
+	$: isSelected = $selectedTaskId === task.id;
+	$: subtasks = task.subtaskIds
+		.map((id) => $tasks.find((task) => task.id === id))
+		.filter((task) => !task.isInTrash);
+
+	$: if (isEditing && $selectedTaskId !== task.id) {
+		saveChangesToTitle();
+		stopEditing();
+	}
+
+	$: if (isEditing && titleInput) {
+		updateTitleDraft();
+		titleInput.focus();
+		titleInput.select();
+	}
+
+	function saveChangesToTitle() {
+		patchTask(task.id, { title: titleDraft });
+	}
+
+	function select() {
+		$selectedTaskId = task.id;
+	}
+
+	function deselect() {
+		$selectedTaskId = null;
+	}
+
+	function startEditing() {
+		isEditing = true;
+	}
+
+	function stopEditing() {
+		isEditing = false;
+	}
+
+	function updateTitleDraft() {
+		titleDraft = task.title;
+	}
+
+	function onChangeCheckbox(event: any) {
+		if (event.target.checked) {
+			patchTask(task.id, { status: "done" });
+		} else {
+			patchTask(task.id, { status: "inProgress" });
 		}
 	}
 
-	let isShowingSubtasks: boolean = false;
-	let taskInput: HTMLInputElement;
+	function onSubmitTitleForm() {
+		saveChangesToTitle();
+		stopEditing();
+	}
 
-	function handleClickLabel() {
-		if ($taskWithFocus !== task) {
-			$taskWithFocus = task;
-			$taskBeingEdited = null;
+	function onKeyDown(event: KeyboardEvent) {
+		var inputs = ["input", "select", "button", "textarea"];
+
+		if (
+			document.activeElement &&
+			inputs.includes(document.activeElement.tagName.toLowerCase())
+		) {
 			return;
 		}
 
-		$taskBeingEdited = task;
-	}
-
-	function handleUpdate() {
-		tasks.patch('update', task);
-	}
-
-	function handleBlurInput() {
-		$taskBeingEdited = null;
-	}
-
-	export async function focus() {
-		await tick();
-
-		if (!taskInput) {
+		if (event.key === "Escape" && isEditing) {
+			event.preventDefault();
+			stopEditing();
 			return;
 		}
 
-		taskInput.focus();
-		taskInput.select();
+		if (event.key === "Escape" && isSelected) {
+			event.preventDefault();
+			deselect();
+			return;
+		}
+
+		if (
+			event.key === "Enter" &&
+			event.metaKey &&
+			isSelected &&
+			!isEditing
+		) {
+			event.preventDefault();
+			startEditing();
+			return;
+		}
+
+		if (event.key === "Enter" && isEditing) {
+			event.preventDefault();
+			saveChangesToTitle();
+			stopEditing();
+			return;
+		}
+
+		if (event.key === " " && !event.altKey && isSelected && !isEditing) {
+			event.preventDefault();
+
+			if (task.status === "done") {
+				patchTask(task.id, { status: "inProgress" });
+			} else {
+				patchTask(task.id, { status: "done" });
+			}
+
+			return;
+		}
+
+		if (
+			((event.key === " " && event.altKey) || event.key === " ") &&
+			isSelected &&
+			!isEditing
+		) {
+			event.preventDefault();
+
+			if (task.status === "dropped") {
+				patchTask(task.id, { status: "inProgress" });
+			} else {
+				patchTask(task.id, { status: "dropped" });
+			}
+
+			return;
+		}
+	}
+
+	function onClickTask() {
+		if (isSelected) {
+			startEditing();
+		} else {
+			select();
+		}
+	}
+
+	function onClickAddSubtask() {
+		const newTask = createTask();
+		tasks.add(newTask);
+		addSubtask(task.id, newTask.id);
+		areSubtasksVisible = true;
+	}
+
+	function toggleSubtaskVisibility() {
+		areSubtasksVisible = !areSubtasksVisible;
 	}
 </script>
 
-<div
-	class="Task"
-	class:has-focus={hasFocus}
-	class:is-editing={isEditing}
->
-	{#if task.subTasks.length}
-		<button class="Task__caret" on:click={() => isShowingSubtasks = !isShowingSubtasks}>
-			{#if isShowingSubtasks}
-				<Icon data={caretDown}/>
+<svelte:window on:keydown={onKeyDown} />
+
+<div class="task" class:is-selected={isSelected}>
+	{#if subtasks.length > 0}
+		<button
+			on:click={toggleSubtaskVisibility}
+			class="button-toggle-subtasks"
+		>
+			{#if areSubtasksVisible}
+				▼
 			{:else}
-				<Icon data={caretRight}/>
+				▶
 			{/if}
 		</button>
 	{/if}
 
 	<input
-		class="Task__status"
+		id={`task-checkbox-${task.id}`}
 		type="checkbox"
-		bind:checked={task.isDone}
-		on:change={handleUpdate}
+		checked={task.status === "done"}
+		indeterminate={task.status === "dropped"}
+		on:change={onChangeCheckbox}
 	/>
 
-	{#if isEditing}
-		<input
-			class="Task__label Task__input"
-			type="text"
-			bind:this={taskInput}
-			bind:value={task.title}
-			on:change={handleUpdate}
-			on:blur={handleBlurInput}
-		/>
-	{:else}
-		<span class="Task__label" on:click={handleClickLabel}>
-			{task.title}
-		</span>
-	{/if}
+	<div
+		class="title"
+		class:is-placeholder={task.title.length === 0}
+		on:click={onClickTask}
+	>
+		{#if isEditing}
+			<form on:submit={onSubmitTitleForm}>
+				<input
+					type="text"
+					bind:value={titleDraft}
+					bind:this={titleInput}
+				/>
+			</form>
+		{:else}
+			<label for={`task-checkbox-${task.id}`} on:click|preventDefault>
+				{#if task.title.length > 0}
+					{task.title}
+				{:else}
+					<span class="placeholder">New task</span>
+				{/if}
+			</label>
+		{/if}
+	</div>
 
-	{#if task.subTasks.length && isShowingSubtasks}
-		<div class="Task__subtasks">
-			<TaskList tasks={task.subTasks}/>
+	{#if task.status === "inProgress" && task.due !== null}
+		<div class="due" class:is-today={when(task.due) === "today"}>
+			{#if when(task.due) === "today"}
+				🚩
+			{/if}
+			{when(task.due)}
 		</div>
 	{/if}
+
+	<div class="options">
+		{#if !task.isInTrash}
+			<button on:click={onClickAddSubtask}>Add subtask</button>
+		{:else}
+			<button
+				on:click={() => {
+					patchTask(task.id, { isInTrash: false });
+				}}
+			>
+				Put back
+			</button>
+		{/if}
+	</div>
 </div>
 
-<style lang="scss">
-	.Task {
-		display: grid;
-		grid-template-rows: 26px min-content;
-		grid-template-columns: 26px 26px 1fr;
-		align-items: center;
+{#if subtasks.length > 0 && areSubtasksVisible}
+	<div class="subtasks">
+		<TaskList tasks={subtasks} />
+	</div>
+{/if}
 
-		&.has-focus {
-			background-color: antiquewhite;
+<style lang="scss">
+	.task {
+		display: grid;
+		grid-template-columns: 26px 26px 1fr max-content max-content;
+
+		&.is-selected {
+			background-color: rgb(213, 238, 255);
 		}
 	}
 
-	.Task__caret {
-		grid-row: 1;
-		grid-column: 1;
-		margin: 0;
-		padding: 0;
-		width: 26px;
-		height: 26px;
+	.button-toggle-subtasks {
+		grid-column: 1 / 2;
 		background-color: transparent;
-		border: 0;
+		border: none;
+		height: var(--baseline);
 	}
 
-	.Task__status {
-		grid-row: 1;
-		grid-column: 2;
+	input[type="checkbox"] {
+		grid-column: 2 / 3;
+		justify-self: center;
+		align-self: baseline;
+		height: var(--baseline);
 	}
 
-	.Task__label {
-		grid-row: 1;
-		grid-column: 3;
-		font-family: sans-serif;
-		line-height: 26px;
-		height: 26px;
+	.title {
+		grid-column: 3 / 4;
+		line-height: var(--baseline);
 	}
 
-	.Task__input {
-		font-size: inherit;
+	.placeholder {
+		opacity: 0.5;
 	}
 
-	.Task__subtasks {
-		grid-row: 2;
-		grid-column: 2 / 4;
+	.due {
+		grid-column: 4 / 5;
+		padding-left: 15px;
+		padding-right: 15px;
+		font-size: var(--font-size-small);
+		line-height: var(--baseline);
+		color: var(--color-text-soft);
+
+		&.is-today {
+			color: hsla(350, 100%, 43%, 0.8);
+			font-weight: bold;
+		}
+	}
+
+	.options {
+		grid-column: 5 / 6;
+	}
+
+	.subtasks {
+		padding-left: 26px;
 	}
 </style>

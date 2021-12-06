@@ -1,6 +1,6 @@
 # Dust bunnies
-A tiny todo list.
 
-* Very much Work In Progress.
-* Move tasks with alt + up/down
-* Data is saved locally.
+A tiny todo app.
+
+- Very much Work In Progress.
+- Data is saved locally.
