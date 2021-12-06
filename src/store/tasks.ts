@@ -94,6 +94,14 @@ export function patchTask(taskId: Task["id"], newValue: Partial<Task>) {
 	});
 }
 
+export function addRootTask(task: Task) {
+	tasks.add(task);
+
+	rootTaskIds.update((rootTaskIds) => {
+		return [...rootTaskIds, task.id];
+	});
+}
+
 export function addSubtask(parentTaskId: Task["id"], subtaskId: Task["id"]) {
 	updateTask(parentTaskId, (task) => {
 		return {

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { when } from "../utilities/dates";
+
 	import {
 		addSubtask,
 		createTask,
@@ -17,9 +19,9 @@
 	let titleInput: HTMLInputElement;
 
 	$: isSelected = $selectedTaskId === task.id;
-	$: subtasks = task.subtaskIds.map((id) =>
-		$tasks.find((task) => task.id === id)
-	);
+	$: subtasks = task.subtaskIds
+		.map((id) => $tasks.find((task) => task.id === id))
+		.filter((task) => !task.isInTrash);
 
 	$: if (isEditing && $selectedTaskId !== task.id) {
 		saveChangesToTitle();
@@ -150,6 +152,7 @@
 		const newTask = createTask();
 		tasks.add(newTask);
 		addSubtask(task.id, newTask.id);
+		areSubtasksVisible = true;
 	}
 
 	function toggleSubtaskVisibility() {
@@ -205,21 +208,26 @@
 		{/if}
 	</div>
 
-	<div class="options">
-		<button on:click={onClickAddSubtask}>Add subtask</button>
+	{#if task.status === "inProgress" && task.due !== null}
+		<div class="due" class:is-today={when(task.due) === "today"}>
+			{#if when(task.due) === "today"}
+				🚩
+			{/if}
+			{when(task.due)}
+		</div>
+	{/if}
 
+	<div class="options">
 		{#if !task.isInTrash}
-			<button
-				on:click={() => {
-					patchTask(task.id, { isInTrash: true });
-				}}>Move to trash</button
-			>
+			<button on:click={onClickAddSubtask}>Add subtask</button>
 		{:else}
 			<button
 				on:click={() => {
 					patchTask(task.id, { isInTrash: false });
-				}}>Put back</button
+				}}
 			>
+				Put back
+			</button>
 		{/if}
 	</div>
 </div>
@@ -233,7 +241,7 @@
 <style lang="scss">
 	.task {
 		display: grid;
-		grid-template-columns: 26px 26px 1fr max-content;
+		grid-template-columns: 26px 26px 1fr max-content max-content;
 
 		&.is-selected {
 			background-color: rgb(213, 238, 255);
@@ -244,6 +252,7 @@
 		grid-column: 1 / 2;
 		background-color: transparent;
 		border: none;
+		height: var(--baseline);
 	}
 
 	input[type="checkbox"] {
@@ -255,15 +264,29 @@
 
 	.title {
 		grid-column: 3 / 4;
-		line-height: 26px;
+		line-height: var(--baseline);
 	}
 
 	.placeholder {
 		opacity: 0.5;
 	}
 
-	.options {
+	.due {
 		grid-column: 4 / 5;
+		padding-left: 15px;
+		padding-right: 15px;
+		font-size: var(--font-size-small);
+		line-height: var(--baseline);
+		color: var(--color-text-soft);
+
+		&.is-today {
+			color: hsla(350, 100%, 43%, 0.8);
+			font-weight: bold;
+		}
+	}
+
+	.options {
+		grid-column: 5 / 6;
 	}
 
 	.subtasks {
