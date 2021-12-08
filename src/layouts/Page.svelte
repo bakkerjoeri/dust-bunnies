@@ -7,15 +7,15 @@
 		patchTask,
 		Task,
 		addRootTask,
-		tasksForToday,
 		deleteTask,
 	} from "../store/tasks";
-	import { link } from "svelte-routing";
 	import Button from "../components/library/Button.svelte";
-	import { isTabletUp, matches } from "../store/mediaquery";
+	import { isPhabletUp, isTabletUp } from "../store/mediaquery";
 	import Modal from "../components/library/Modal.svelte";
-	import { writable } from "svelte/store";
+	import { get, writable } from "svelte/store";
 	import ActionRow from "../components/library/ActionRow.svelte";
+	import Navigation from "../components/Navigation.svelte";
+	import { isNavigationOpen } from "../store/ui";
 
 	interface Action {
 		label: string;
@@ -24,8 +24,6 @@
 
 	export let actions: Action[] = [];
 
-	const isNavigationOpen = writable<boolean>(matches("(min-width: 1021px)"));
-
 	$: pageActions = [
 		...actions,
 		{
@@ -33,6 +31,12 @@
 			callback: onClickAddNewTask,
 		},
 	];
+
+	function onNavigate() {
+		$isNavigationOpen = get(isPhabletUp);
+		$selectedTaskId = null;
+		window.scrollTo({ top: 0, left: 0 });
+	}
 
 	function onClickAddNewTask() {
 		const newTask = createTask();
@@ -47,28 +51,9 @@
 
 <div class="page" class:is-navigation-open={$isNavigationOpen}>
 	{#if $isNavigationOpen}
-		<nav>
-			<ul>
-				<li>
-					<a href="/" use:link>Inbox</a>
-				</li>
-
-				<li>
-					<a href="/today" use:link>Today</a>
-					{#if $tasksForToday.length > 0}
-						&middot; {$tasksForToday.length}
-					{/if}
-				</li>
-
-				<li>
-					<a href="/someday" use:link>Someday</a>
-				</li>
-
-				<li>
-					<a href="/logbook" use:link>Logbook</a>
-				</li>
-			</ul>
-		</nav>
+		<div class="navigation">
+			<Navigation on:navigate={onNavigate} />
+		</div>
 	{/if}
 
 	<header>
@@ -157,7 +142,7 @@
 		}
 	}
 
-	nav {
+	.navigation {
 		grid-column: 1 / 2;
 		grid-row: 2 / -1;
 		width: 100vw;
@@ -167,10 +152,6 @@
 			width: 180px;
 			border-right: 1px solid var(--border-color-ui-secondary);
 		}
-	}
-
-	ul {
-		list-style: none;
 	}
 
 	header {
@@ -197,7 +178,7 @@
 		padding: var(--baseline);
 	}
 
-	nav,
+	.navigation,
 	aside {
 		position: sticky;
 		overflow: scroll;
