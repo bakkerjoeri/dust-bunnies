@@ -1,12 +1,9 @@
 import uuid from "@bakkerjoeri/uuid";
 import dayjs from "dayjs";
-import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { derived, get, writable } from "svelte/store";
 import { collectionStore } from "./collectionStore";
 import { localStore } from "./localStore";
 import type { Readable } from "svelte/store";
-
-dayjs.extend(isSameOrBefore);
 
 export interface Task {
 	id: string;
