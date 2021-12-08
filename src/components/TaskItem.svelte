@@ -153,6 +153,7 @@
 		tasks.add(newTask);
 		addSubtask(task.id, newTask.id);
 		areSubtasksVisible = true;
+		$selectedTaskId = newTask.id;
 	}
 
 	function toggleSubtaskVisibility() {
