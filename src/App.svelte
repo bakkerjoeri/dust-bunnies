@@ -4,7 +4,6 @@
 	import Today from "./pages/Today.svelte";
 	import Someday from "./pages/Someday.svelte";
 	import Logbook from "./pages/Logbook.svelte";
-	import Trash from "./pages/Trash.svelte";
 </script>
 
 <Router>
@@ -22,9 +21,5 @@
 
 	<Route path="/logbook">
 		<Logbook />
-	</Route>
-
-	<Route path="/trash">
-		<Trash />
 	</Route>
 </Router>

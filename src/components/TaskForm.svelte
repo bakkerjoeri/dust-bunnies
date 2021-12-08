@@ -6,8 +6,9 @@
 	import TextArea from "./library/form/TextArea.svelte";
 	import TagInput from "./TagInput.svelte";
 	import type { Task } from "../store/tasks";
-	import RadioGroup from "./library/form/RadioGroup.svelte";
-	import dayjs, { unix } from "dayjs";
+	import TaskStatusInput from "./TaskStatusInput.svelte";
+	import { getDateValueForEvent, getFormattedDate } from "../utilities/dates";
+	import TaskDeferInput from "./TaskDeferInput.svelte";
 
 	export let title: string;
 	export let notes: string;
@@ -16,14 +17,12 @@
 	export let deferType: Task["deferType"];
 	export let deferredTo: Task["deferredTo"];
 	export let due: Task["due"];
-	export let isInTrash = false;
 
-	const dispatch =
-		createEventDispatcher<{
-			save: Partial<Task>;
-			delete: undefined;
-			cancel: undefined;
-		}>();
+	const dispatch = createEventDispatcher<{
+		save: Partial<Task>;
+		delete: undefined;
+		cancel: undefined;
+	}>();
 
 	function save() {
 		dispatch("save", {
@@ -36,27 +35,16 @@
 			due,
 		});
 	}
-
-	function getFormattedDate(unixDate: number): string {
-		return dayjs(unixDate).format("YYYY-MM-DD");
-	}
-
-	function getUnixDate(dateString: string): number {
-		return dayjs(dateString).valueOf();
-	}
-
-	function getDateValueForEvent(event: any) {
-		if (!event.target.value) {
-			return null;
-		}
-
-		return getUnixDate(event.target.value);
-	}
 </script>
 
 <form on:submit|preventDefault={save}>
 	<FormItem label="Title" let:id>
-		<InputText type="text" bind:value={title} {id} />
+		<InputText
+			type="text"
+			bind:value={title}
+			{id}
+			autofocus={title === ""}
+		/>
 	</FormItem>
 
 	<FormItem label="Notes" let:id>
@@ -68,57 +56,12 @@
 	</FormItem>
 
 	<FormItem label="Status">
-		<RadioGroup
-			bind:value={status}
-			options={[
-				{
-					text: "In progress",
-					value: "inProgress",
-				},
-				{
-					text: "Done",
-					value: "done",
-				},
-				{
-					text: "Dropped",
-					value: "dropped",
-				},
-			]}
-		/>
+		<TaskStatusInput bind:value={status} />
 	</FormItem>
 
 	<FormItem label="Defer until">
-		<RadioGroup
-			bind:value={deferType}
-			options={[
-				{
-					text: "Don't defer",
-					value: "none",
-				},
-				{
-					text: "Specific date",
-					value: "date",
-				},
-				{
-					text: "Someday",
-					value: "someday",
-				},
-			]}
-		/>
+		<TaskDeferInput bind:deferType bind:deferredTo />
 	</FormItem>
-
-	{#if deferType === "date"}
-		<FormItem label="Defer date" let:id>
-			<input
-				type="date"
-				{id}
-				value={getFormattedDate(deferredTo)}
-				on:change={(event) => {
-					deferredTo = getDateValueForEvent(event);
-				}}
-			/>
-		</FormItem>
-	{/if}
 
 	<FormItem label="Due" let:id>
 		<input
@@ -135,11 +78,7 @@
 	<Button on:click={() => dispatch("cancel")} variant="outline">Cancel</Button
 	>
 
-	{#if !isInTrash}
-		<Button
-			on:click={() => dispatch("delete")}
-			variant="outline"
-			color="danger">Move to trash</Button
-		>
-	{/if}
+	<Button on:click={() => dispatch("delete")} variant="outline" color="danger"
+		>Delete</Button
+	>
 </form>

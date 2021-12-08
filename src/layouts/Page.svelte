@@ -4,11 +4,11 @@
 		createTask,
 		selectedTask,
 		selectedTaskId,
-		tasksInTrash,
 		patchTask,
 		Task,
 		addRootTask,
 		tasksForToday,
+		deleteTask,
 	} from "../store/tasks";
 	import { link } from "svelte-routing";
 	import Button from "../components/library/Button.svelte";
@@ -67,12 +67,6 @@
 				<li>
 					<a href="/logbook" use:link>Logbook</a>
 				</li>
-
-				{#if $tasksInTrash.length > 0}
-					<li>
-						<a href="/trash" use:link>Trash</a>
-					</li>
-				{/if}
 			</ul>
 		</nav>
 	{/if}
@@ -114,7 +108,6 @@
 					deferType={$selectedTask.deferType}
 					deferredTo={$selectedTask.deferredTo}
 					due={$selectedTask.due}
-					isInTrash={$selectedTask.isInTrash}
 					on:save={({ detail: newValue }) => {
 						onSaveTask(newValue);
 					}}
@@ -122,10 +115,7 @@
 						$selectedTaskId = null;
 					}}
 					on:delete={() => {
-						patchTask($selectedTask.id, {
-							isInTrash: true,
-						});
-						$selectedTaskId = null;
+						deleteTask($selectedTaskId);
 					}}
 				/>
 			</aside>
@@ -139,7 +129,6 @@
 					deferType={$selectedTask.deferType}
 					deferredTo={$selectedTask.deferredTo}
 					due={$selectedTask.due}
-					isInTrash={$selectedTask.isInTrash}
 					on:save={({ detail: newValue }) => {
 						onSaveTask(newValue);
 						$selectedTaskId = null;
@@ -148,10 +137,7 @@
 						$selectedTaskId = null;
 					}}
 					on:delete={() => {
-						patchTask($selectedTask.id, {
-							isInTrash: true,
-						});
-						$selectedTaskId = null;
+						deleteTask($selectedTaskId);
 					}}
 				/>
 			</Modal>

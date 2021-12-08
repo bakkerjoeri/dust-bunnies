@@ -19,9 +19,9 @@
 	let titleInput: HTMLInputElement;
 
 	$: isSelected = $selectedTaskId === task.id;
-	$: subtasks = task.subtaskIds
-		.map((id) => $tasks.find((task) => task.id === id))
-		.filter((task) => !task.isInTrash);
+	$: subtasks = task.subtaskIds.map((id) =>
+		$tasks.find((task) => task.id === id)
+	);
 
 	$: if (isEditing && $selectedTaskId !== task.id) {
 		saveChangesToTitle();
@@ -58,11 +58,11 @@
 		titleDraft = task.title;
 	}
 
-	function onChangeCheckbox(event: any) {
-		if (event.target.checked) {
-			patchTask(task.id, { status: "done" });
-		} else {
+	function onClickCheckbox(event: any) {
+		if (task.status === "done" || task.status === "dropped") {
 			patchTask(task.id, { status: "inProgress" });
+		} else {
+			patchTask(task.id, { status: "done" });
 		}
 	}
 
@@ -181,7 +181,7 @@
 		type="checkbox"
 		checked={task.status === "done"}
 		indeterminate={task.status === "dropped"}
-		on:change={onChangeCheckbox}
+		on:click|preventDefault={onClickCheckbox}
 	/>
 
 	<div
@@ -218,17 +218,7 @@
 	{/if}
 
 	<div class="options">
-		{#if !task.isInTrash}
-			<button on:click={onClickAddSubtask}>Add subtask</button>
-		{:else}
-			<button
-				on:click={() => {
-					patchTask(task.id, { isInTrash: false });
-				}}
-			>
-				Put back
-			</button>
-		{/if}
+		<button on:click={onClickAddSubtask}>Add subtask</button>
 	</div>
 </div>
 

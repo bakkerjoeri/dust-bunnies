@@ -5,6 +5,7 @@
 	export let type: "text" | "url" | "email" = "text";
 	export let state: boolean | null = null;
 	export let autocomplete: string = null;
+	export let autofocus: boolean = false;
 	export let autocapitalize: string = null;
 	export let placeholder: string = null;
 	export let required: boolean = false;
@@ -34,6 +35,7 @@
 		on:input={handleInput}
 		{value}
 		{type}
+		{autofocus}
 		{autocomplete}
 		{autocapitalize}
 		{placeholder}

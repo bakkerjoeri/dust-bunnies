@@ -22,7 +22,6 @@ export interface Task {
 	updatedAt: null | number;
 	doneAt: null | number;
 	droppedAt: null | number;
-	isInTrash: boolean;
 }
 
 export function createTask(value: Partial<Task> = {}): Task {
@@ -40,7 +39,6 @@ export function createTask(value: Partial<Task> = {}): Task {
 		updatedAt: null,
 		doneAt: null,
 		droppedAt: null,
-		isInTrash: false,
 		...value,
 	};
 }
@@ -111,6 +109,30 @@ export function addSubtask(parentTaskId: Task["id"], subtaskId: Task["id"]) {
 	});
 }
 
+export function deleteTask(taskId: Task["id"]) {
+	// Remove from rootTaskIds
+	rootTaskIds.update((rootTaskIds) => {
+		return rootTaskIds.filter((rootTaskId) => rootTaskId !== taskId);
+	});
+
+	// Remove from subtaskIds
+	tasks.update((tasks) => {
+		return tasks.map((task) => {
+			return {
+				...task,
+				subtaskIds: task.subtaskIds.filter(
+					(subtaskId) => subtaskId !== taskId
+				),
+			};
+		});
+	});
+
+	// Remove from selectedTaskId
+	if (get(selectedTaskId) === taskId) {
+		selectedTaskId.set(null);
+	}
+}
+
 export const rootTaskIds = localStore<Task["id"][]>(
 	"rootTaskIds",
 	writable([])
@@ -122,7 +144,7 @@ export const rootTasks = derived(
 	}
 );
 export const activeTasks = derived([rootTasks], ([rootTasks]) => {
-	return rootTasks.filter((task) => !task.isInTrash);
+	return rootTasks;
 });
 
 export const selectedTaskId = writable<Task["id"] | null>(null);
@@ -144,7 +166,7 @@ export const inbox = derived([activeTasks], ([activeTasks]) => {
 			task.deferType === "none" ||
 			(task.deferType === "date" && task.deferredTo === null);
 
-		return !task.isInTrash && isTaskInProgress && isTaskUndeferred;
+		return isTaskInProgress && isTaskUndeferred;
 	});
 });
 
@@ -172,8 +194,4 @@ export const tasksInLogbook = derived([activeTasks], ([activeTasks]) => {
 	return activeTasks.filter((task) => {
 		return task.status === "done" || task.status === "dropped";
 	});
-});
-
-export const tasksInTrash = derived([rootTasks], ([rootTasks]) => {
-	return rootTasks.filter((task) => task.isInTrash);
 });
