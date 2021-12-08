@@ -141,7 +141,13 @@ export const rootTasks = derived(
 	}
 );
 export const activeTasks = derived([rootTasks], ([rootTasks]) => {
-	return rootTasks;
+	return [...rootTasks];
+});
+
+export const inProgressTasks = derived([activeTasks], ([activeTasks]) => {
+	return activeTasks.filter((task) => {
+		return task.status === "inProgress";
+	});
 });
 
 export const selectedTaskId = writable<Task["id"] | null>(null);

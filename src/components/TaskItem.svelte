@@ -244,6 +244,7 @@
 		background-color: transparent;
 		border: none;
 		height: var(--baseline);
+		color: var(--color-text-soft);
 	}
 
 	input[type="checkbox"] {

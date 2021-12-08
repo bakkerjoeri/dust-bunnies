@@ -32,5 +32,7 @@
 
 	{#if $tasksForToday.length > 0}
 		<TaskList tasks={$tasksForToday} />
+	{:else}
+		<p>Looks like you're done for today. Enjoy!</p>
 	{/if}
 </Page>
