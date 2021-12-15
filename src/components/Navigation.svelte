@@ -5,10 +5,10 @@
 
 <nav>
 	<ul>
-		<NavigationItem on:navigate to="/">Inbox</NavigationItem>
+		<NavigationItem on:navigate to="/inbox">Inbox</NavigationItem>
 		<NavigationItem
+			to="/"
 			on:navigate
-			to="/today"
 			count={$tasksForToday.length > 0
 				? $tasksForToday.length
 				: undefined}

@@ -8,11 +8,11 @@
 </script>
 
 <Router>
-	<Route path="/">
+	<Route path="/inbox">
 		<Inbox />
 	</Route>
 
-	<Route path="/today">
+	<Route path="/">
 		<Today />
 	</Route>
 
