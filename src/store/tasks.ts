@@ -189,8 +189,8 @@ export const tasksForToday = derived([activeTasks], ([activeTasks]) => {
 	});
 });
 
-export const tasksForSomeday = derived([activeTasks], ([activeTasks]) => {
-	return activeTasks.filter((task) => task.deferType === "someday");
+export const tasksForSomeday = derived([inProgressTasks], ([inProgressTasks]) => {
+	return inProgressTasks.filter((task) => task.deferType === "someday");
 });
 
 export const tasksInLogbook = derived([activeTasks], ([activeTasks]) => {
