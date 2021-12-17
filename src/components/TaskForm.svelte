@@ -47,16 +47,16 @@
 		/>
 	</FormItem>
 
+	<FormItem label="Status">
+		<TaskStatusInput bind:value={status} />
+	</FormItem>
+
 	<FormItem label="Notes" let:id>
 		<TextArea bind:value={notes} {id} />
 	</FormItem>
 
 	<FormItem label="Tags" let:id>
 		<TagInput {id} bind:tags />
-	</FormItem>
-
-	<FormItem label="Status">
-		<TaskStatusInput bind:value={status} />
 	</FormItem>
 
 	<FormItem label="Defer until">
