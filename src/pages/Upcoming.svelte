@@ -23,7 +23,7 @@
 		tasks: Task[]
 	): Array<{ datestring: string; tasks: Task[] }> {
 		return tasks.reduce((result, task) => {
-			if (task.due === null && task.deferredTo === null) {
+			if (task.due === null && (task.deferType !== "date" || task.deferredTo === null)) {
 				return result;
 			}
 
