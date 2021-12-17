@@ -176,6 +176,7 @@
 
 		width: 400px;
 		padding: var(--baseline);
+		border-left: 1px solid var(--border-color-ui-secondary);
 	}
 
 	.navigation,
