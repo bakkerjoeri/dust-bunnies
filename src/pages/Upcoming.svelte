@@ -27,7 +27,7 @@
 				return result;
 			}
 
-			const date = task.due ? task.due : task.deferredTo;
+			const date = task.deferredTo ? task.deferredTo : task.due;
 			const datestring = dayjs(date).format("YYYY-MM-DD");
 
 			if (result.some((entry) => entry.datestring === datestring)) {
