@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 
-export function when(date: number): string {
+export function fuzzyFutureDifference(date: number): string {
 	const now = dayjs();
 	const then = dayjs(date);
 

@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { when } from "../utilities/dates";
-
+	import { fuzzyFutureDifference } from "../utilities/dates";
 	import {
 		addSubtask,
 		createTask,
@@ -58,7 +57,7 @@
 		titleDraft = task.title;
 	}
 
-	function onClickCheckbox(event: any) {
+	function onClickCheckbox() {
 		if (task.status === "done" || task.status === "dropped") {
 			patchTask(task.id, { status: "inProgress" });
 		} else {
@@ -210,11 +209,11 @@
 	</div>
 
 	{#if task.status === "inProgress" && task.due !== null}
-		<div class="due" class:is-today={when(task.due) === "today"}>
-			{#if when(task.due) === "today"}
+		<div class="due" class:is-today={fuzzyFutureDifference(task.due) === "today"}>
+			{#if fuzzyFutureDifference(task.due) === "today"}
 				🚩
 			{/if}
-			{when(task.due)}
+			{fuzzyFutureDifference(task.due)}
 		</div>
 	{/if}
 
