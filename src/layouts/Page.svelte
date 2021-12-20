@@ -136,9 +136,11 @@
 		grid-template-columns: auto 1fr auto;
 		grid-template-rows: calc(2 * var(--baseline)) 1fr;
 
-		&.is-navigation-open {
-			height: 100vh;
-			overflow: hidden;
+		@media (max-width: 640px) {
+			&.is-navigation-open {
+				height: 100vh;
+				overflow: hidden;
+			}
 		}
 	}
 
@@ -184,6 +186,6 @@
 		position: sticky;
 		overflow: scroll;
 		top: calc(1 * var(--baseline));
-		height: calc(100vh - 1 * var(--baseline));
+		height: calc(100vh - 2 * var(--baseline));
 	}
 </style>
