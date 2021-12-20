@@ -168,8 +168,9 @@ export const inbox = derived([activeTasks], ([activeTasks]) => {
 		const isTaskUndeferred =
 			task.deferType === "none" ||
 			(task.deferType === "date" && task.deferredTo === null);
+		const isTaskWithoutDueDate = task.due === null;
 
-		return isTaskInProgress && isTaskUndeferred;
+		return isTaskInProgress && isTaskUndeferred && isTaskWithoutDueDate;
 	});
 });
 
