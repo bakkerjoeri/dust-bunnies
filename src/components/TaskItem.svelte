@@ -8,6 +8,7 @@
 		Task,
 		tasks,
 	} from "./../store/tasks";
+import DueLabel from "./DueLabel.svelte";
 	import TaskList from "./TaskList.svelte";
 
 	export let task: Task;
@@ -209,11 +210,8 @@
 	</div>
 
 	{#if task.status === "inProgress" && task.due !== null}
-		<div class="due" class:is-today={fuzzyFutureDifference(task.due) === "today"}>
-			{#if fuzzyFutureDifference(task.due) === "today"}
-				🚩
-			{/if}
-			{fuzzyFutureDifference(task.due)}
+		<div class="due">
+			<DueLabel due={task.due}/>
 		</div>
 	{/if}
 
@@ -266,14 +264,6 @@
 		grid-column: 4 / 5;
 		padding-left: 15px;
 		padding-right: 15px;
-		font-size: var(--font-size-small);
-		line-height: var(--baseline);
-		color: var(--color-text-soft);
-
-		&.is-today {
-			color: hsla(350, 100%, 43%, 0.8);
-			font-weight: bold;
-		}
 	}
 
 	.options {
