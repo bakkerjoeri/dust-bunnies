@@ -32,7 +32,7 @@ export function fuzzyFutureDifference(date: number): string {
 		return "tomorrow";
 	}
 
-	if (then.isToday()) {
+	if (then.isToday() || then.diff(now, "day") < 0) {
 		return "today";
 	}
 
