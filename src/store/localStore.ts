@@ -5,7 +5,7 @@ export function localStore<TValue>(
 	key: string,
 	store = writable<TValue>()
 ): Writable<TValue> {
-	if (localStorage.getItem(key) !== null) {
+	if (localStorage.getItem(key) !== null && isValidJSON(localStorage.getItem(key))) {
 		const savedValue = JSON.parse(localStorage.getItem(key));
 		store.set(savedValue);
 	} else if (get(store) !== undefined) {
@@ -35,4 +35,14 @@ function save(key: string, value: any): void {
 	}
 
 	localStorage.setItem(key, JSON.stringify(value));
+}
+
+function isValidJSON(value: string) {
+	try {
+		JSON.parse(value);
+	} catch (e) {
+		return false;
+	}
+
+	return true;
 }

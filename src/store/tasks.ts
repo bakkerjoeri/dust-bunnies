@@ -4,6 +4,9 @@ import { derived, get, writable } from "svelte/store";
 import { collectionStore } from "./collectionStore";
 import { localStore } from "./localStore";
 import type { Readable } from "svelte/store";
+import { database } from "./../utilities/firebase";
+import { firestoreUserCollection, firestoreUserDocument, firestoreUserDocumentField } from "./firestore";
+import { isLoggedIn } from "./session";
 
 export interface Task {
 	id: string;
@@ -40,7 +43,18 @@ export function createTask(value: Partial<Task> = {}): Task {
 	};
 }
 
-export const tasks = collectionStore(localStore<Task[]>("tasks", writable([])));
+function createTaskStore() {
+	const local = localStore<Task[]>("tasks", writable([]));
+	const remote = firestoreUserCollection<Task>(
+		database,
+		"tasks",
+		local
+	);
+	const collection = collectionStore<Task>(remote);
+
+	return collection;
+}
+export const tasks = createTaskStore();
 
 export function findTask(taskId: Task["id"]): Task {
 	const task = get(tasks).find((task) => task.id === taskId);
@@ -130,16 +144,18 @@ export function deleteTask(taskId: Task["id"]) {
 	}
 }
 
-export const rootTaskIds = localStore<Task["id"][]>(
+export const rootTaskIds = firestoreUserDocumentField(database, "", "rootTaskIds", localStore<Task["id"][]>(
 	"rootTaskIds",
 	writable([])
-);
+));
+
 export const rootTasks = derived(
 	[rootTaskIds, tasks],
 	([rootTaskIds, tasks]) => {
 		return rootTaskIds.map((id) => tasks.find((task) => task.id === id));
 	}
 );
+
 export const activeTasks = derived([rootTasks], ([rootTasks]) => {
 	return [...rootTasks];
 });

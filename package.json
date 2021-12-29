@@ -23,6 +23,10 @@
 	},
 	"dependencies": {
 		"@bakkerjoeri/uuid": "^1.0.0",
-		"dayjs": "^1.10.7"
+		"@snowpack/plugin-dotenv": "^2.2.0",
+		"@types/lodash-es": "^4.17.5",
+		"dayjs": "^1.10.7",
+		"firebase": "^9.6.1",
+		"lodash-es": "^4.17.21"
 	}
 }

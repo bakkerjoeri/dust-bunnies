@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { Router, Route } from "svelte-routing";
+	import Signup from "./pages/Signup.svelte";
+	import Login from "./pages/Login.svelte";
 	import Inbox from "./pages/Inbox.svelte";
 	import Today from "./pages/Today.svelte";
 	import Someday from "./pages/Someday.svelte";
@@ -8,6 +10,14 @@
 </script>
 
 <Router>
+	<Route path="/signup">
+		<Signup />
+	</Route>
+
+	<Route path="/login">
+		<Login />
+	</Route>
+
 	<Route path="/inbox">
 		<Inbox />
 	</Route>
