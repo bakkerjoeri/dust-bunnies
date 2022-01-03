@@ -6,7 +6,7 @@
 		selectedTaskId,
 		patchTask,
 		Task,
-		addRootTask,
+		addTask,
 		deleteTask,
 	} from "../store/tasks";
 	import Button from "../components/library/Button.svelte";
@@ -40,7 +40,7 @@
 
 	function onClickAddNewTask() {
 		const newTask = createTask();
-		addRootTask(newTask);
+		addTask(newTask);
 		$selectedTaskId = newTask.id;
 	}
 

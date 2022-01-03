@@ -2,7 +2,7 @@
 	import TaskList from "../components/TaskList.svelte";
 	import Page from "../layouts/Page.svelte";
 	import {
-		addRootTask,
+		addTask,
 		createTask,
 		selectedTaskId,
 		tasksForSomeday,
@@ -20,7 +20,7 @@
 			deferType: "someday",
 		});
 
-		addRootTask(newTask);
+		addTask(newTask);
 		$selectedTaskId = newTask.id;
 	}
 </script>

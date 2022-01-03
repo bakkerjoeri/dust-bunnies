@@ -5,8 +5,7 @@ import { collectionStore } from "./collectionStore";
 import { localStore } from "./localStore";
 import type { Readable } from "svelte/store";
 import { database } from "./../utilities/firebase";
-import { firestoreUserCollection, firestoreUserDocument, firestoreUserDocumentField } from "./firestore";
-import { isLoggedIn } from "./session";
+import { firestoreUserCollection} from "./firestore";
 
 export interface Task {
 	id: string;
@@ -103,12 +102,8 @@ export function patchTask(taskId: Task["id"], newValue: Partial<Task>) {
 	});
 }
 
-export function addRootTask(task: Task) {
+export function addTask(task: Task) {
 	tasks.add(task);
-
-	rootTaskIds.update((rootTaskIds) => {
-		return [...rootTaskIds, task.id];
-	});
 }
 
 export function addSubtask(parentTaskId: Task["id"], subtaskId: Task["id"]) {
@@ -121,11 +116,6 @@ export function addSubtask(parentTaskId: Task["id"], subtaskId: Task["id"]) {
 }
 
 export function deleteTask(taskId: Task["id"]) {
-	// Remove from rootTaskIds
-	rootTaskIds.update((rootTaskIds) => {
-		return rootTaskIds.filter((rootTaskId) => rootTaskId !== taskId);
-	});
-
 	// Remove from subtaskIds
 	tasks.update((tasks) => {
 		return tasks.map((task) => {
@@ -144,15 +134,18 @@ export function deleteTask(taskId: Task["id"]) {
 	}
 }
 
-export const rootTaskIds = firestoreUserDocumentField(database, "", "rootTaskIds", localStore<Task["id"][]>(
-	"rootTaskIds",
-	writable([])
-));
-
 export const rootTasks = derived(
-	[rootTaskIds, tasks],
-	([rootTaskIds, tasks]) => {
-		return rootTaskIds.map((id) => tasks.find((task) => task.id === id));
+	[tasks],
+	([tasks]) => {
+		const allSubtaskIds = tasks.reduce((allSubtaskIds, task) => {
+			return [...allSubtaskIds, ...task.subtaskIds];
+		}, []);
+
+		const tasksWithoutParent = tasks.filter((task) => {
+			return !allSubtaskIds.includes(task.id);
+		});
+
+		return tasksWithoutParent; 
 	}
 );
 
@@ -215,3 +208,4 @@ export const tasksInLogbook = derived([activeTasks], ([activeTasks]) => {
 		return task.status === "done" || task.status === "dropped";
 	});
 });
+
