@@ -116,16 +116,20 @@ export function addSubtask(parentTaskId: Task["id"], subtaskId: Task["id"]) {
 }
 
 export function deleteTask(taskId: Task["id"]) {
-	// Remove from subtaskIds
 	tasks.update((tasks) => {
-		return tasks.map((task) => {
-			return {
-				...task,
-				subtaskIds: task.subtaskIds.filter(
-					(subtaskId) => subtaskId !== taskId
-				),
-			};
-		});
+		// Remove from subtaskIds
+		return tasks
+			.filter((task) => {
+				return task.id !== taskId;
+			})
+			.map((task) => {
+				return {
+					...task,
+					subtaskIds: task.subtaskIds.filter(
+						(subtaskId) => subtaskId !== taskId
+					),
+				};
+			});
 	});
 
 	// Remove from selectedTaskId
