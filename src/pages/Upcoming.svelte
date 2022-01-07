@@ -3,7 +3,7 @@
 
 	import TaskList from "../components/TaskList.svelte";
 	import Page from "../layouts/Page.svelte";
-	import { inProgressTasks, Task } from "../store/tasks";
+	import { inProgressTasks, isTaskForToday, Task } from "../store/tasks";
 
 	$: groupedTasks = groupTasksByDate($inProgressTasks).sort(
 		(entryA, entryB) => {
@@ -27,7 +27,14 @@
 				return result;
 			}
 
-			const date = task.deferredTo ? task.deferredTo : task.due;
+			const date = (() => {
+				if (isTaskForToday(task)) {
+					return new Date().valueOf();
+				}
+
+				return task.deferredTo ? task.deferredTo : task.due;
+			})();
+
 			const datestring = dayjs(date).format("YYYY-MM-DD");
 
 			if (result.some((entry) => entry.datestring === datestring)) {

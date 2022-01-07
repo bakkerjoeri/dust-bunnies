@@ -5,7 +5,7 @@ import { collectionStore } from "./collectionStore";
 import { localStore } from "./localStore";
 import type { Readable } from "svelte/store";
 import { database } from "./../utilities/firebase";
-import { firestoreUserCollection} from "./firestore";
+import { firestoreUserCollection } from "./firestore";
 
 export interface Task {
 	id: string;
@@ -44,11 +44,7 @@ export function createTask(value: Partial<Task> = {}): Task {
 
 function createTaskStore() {
 	const local = localStore<Task[]>("tasks", writable([]));
-	const remote = firestoreUserCollection<Task>(
-		database,
-		"tasks",
-		local
-	);
+	const remote = firestoreUserCollection<Task>(database, "tasks", local);
 	const collection = collectionStore<Task>(remote);
 
 	return collection;
@@ -138,20 +134,17 @@ export function deleteTask(taskId: Task["id"]) {
 	}
 }
 
-export const rootTasks = derived(
-	[tasks],
-	([tasks]) => {
-		const allSubtaskIds = tasks.reduce((allSubtaskIds, task) => {
-			return [...allSubtaskIds, ...task.subtaskIds];
-		}, []);
+export const rootTasks = derived([tasks], ([tasks]) => {
+	const allSubtaskIds = tasks.reduce((allSubtaskIds, task) => {
+		return [...allSubtaskIds, ...task.subtaskIds];
+	}, []);
 
-		const tasksWithoutParent = tasks.filter((task) => {
-			return !allSubtaskIds.includes(task.id);
-		});
+	const tasksWithoutParent = tasks.filter((task) => {
+		return !allSubtaskIds.includes(task.id);
+	});
 
-		return tasksWithoutParent; 
-	}
-);
+	return tasksWithoutParent;
+});
 
 export const activeTasks = derived([rootTasks], ([rootTasks]) => {
 	return [...rootTasks];
@@ -188,24 +181,15 @@ export const inbox = derived([activeTasks], ([activeTasks]) => {
 });
 
 export const tasksForToday = derived([activeTasks], ([activeTasks]) => {
-	return activeTasks.filter((task) => {
-		const isTaskInProgress = task.status === "inProgress";
-		const isTaskDeferredToToday =
-			task.deferType === "date" &&
-			task.deferredTo !== null &&
-			dayjs(task.deferredTo).isSameOrBefore(dayjs(new Date(), "day"));
-
-		const isTaskDueToday =
-			task.due !== null &&
-			dayjs(task.due).isSameOrBefore(dayjs(new Date(), "day"));
-
-		return isTaskInProgress && (isTaskDeferredToToday || isTaskDueToday);
-	});
+	return activeTasks.filter(isTaskForToday);
 });
 
-export const tasksForSomeday = derived([inProgressTasks], ([inProgressTasks]) => {
-	return inProgressTasks.filter((task) => task.deferType === "someday");
-});
+export const tasksForSomeday = derived(
+	[inProgressTasks],
+	([inProgressTasks]) => {
+		return inProgressTasks.filter((task) => task.deferType === "someday");
+	}
+);
 
 export const tasksInLogbook = derived([activeTasks], ([activeTasks]) => {
 	return activeTasks.filter((task) => {
@@ -213,3 +197,16 @@ export const tasksInLogbook = derived([activeTasks], ([activeTasks]) => {
 	});
 });
 
+export function isTaskForToday(task: Task): boolean {
+	const isTaskInProgress = task.status === "inProgress";
+	const isTaskDeferredToToday =
+		task.deferType === "date" &&
+		task.deferredTo !== null &&
+		dayjs(task.deferredTo).isSameOrBefore(dayjs(new Date(), "day"));
+
+	const isTaskDueToday =
+		task.due !== null &&
+		dayjs(task.due).isSameOrBefore(dayjs(new Date(), "day"));
+
+	return isTaskInProgress && (isTaskDeferredToToday || isTaskDueToday);
+}
