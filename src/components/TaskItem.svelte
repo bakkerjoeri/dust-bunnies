@@ -150,8 +150,7 @@ import DueLabel from "./DueLabel.svelte";
 
 	function onClickAddSubtask() {
 		const newTask = createTask();
-		tasks.add(newTask);
-		addSubtask(task.id, newTask.id);
+		addSubtask(task.id, newTask);
 		areSubtasksVisible = true;
 		$selectedTaskId = newTask.id;
 	}
