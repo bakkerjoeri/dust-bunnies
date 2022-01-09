@@ -65,7 +65,13 @@ export function updateTask(
 	taskId: Task["id"],
 	updater: (task: Task) => Task
 ): void {
-	const oldValue = findTask(taskId);
+	const task = findTask(taskId);
+	const newValue = applyUpdaterToTask(task, updater);
+	tasks.patch(taskId, newValue);
+}
+
+function applyUpdaterToTask(task: Task, updater: (task: Task) => Task): Task {
+	const oldValue = task;
 	const newValue = updater(oldValue);
 
 	newValue.updatedAt = new Date().valueOf();
@@ -86,7 +92,7 @@ export function updateTask(
 		newValue.droppedAt = null;
 	}
 
-	tasks.patch(taskId, newValue);
+	return newValue;
 }
 
 export function patchTask(taskId: Task["id"], newValue: Partial<Task>) {
@@ -103,29 +109,40 @@ export function addTask(task: Task) {
 }
 
 export function addSubtask(parentTaskId: Task["id"], subtask: Task) {
-	updateTask(parentTaskId, (task) => {
-		return {
-			...task,
-			subtaskIds: [...task.subtaskIds, subtaskId],
-		};
+	tasks.update((tasks) => {
+		const tasksWithSubtask = [...tasks, subtask];
+
+		return tasksWithSubtask.map((task) => {
+			if (task.id !== parentTaskId) {
+				return task;
+			}
+
+			return {
+				...task,
+				subtaskIds: [...task.subtaskIds, subtask.id],
+			};
+		});
 	});
 }
 
 export function deleteTask(taskId: Task["id"]) {
 	tasks.update((tasks) => {
-		// Remove from subtaskIds
-		return tasks
-			.filter((task) => {
-				return task.id !== taskId;
-			})
-			.map((task) => {
-				return {
-					...task,
-					subtaskIds: task.subtaskIds.filter(
-						(subtaskId) => subtaskId !== taskId
-					),
-				};
-			});
+		return (
+			tasks
+				// Delete the task itself
+				.filter((task) => {
+					return task.id !== taskId;
+				})
+				// Remove it from any task's subtasks
+				.map((task) => {
+					return {
+						...task,
+						subtaskIds: task.subtaskIds.filter(
+							(subtaskId) => subtaskId !== taskId
+						),
+					};
+				})
+		);
 	});
 
 	// Remove from selectedTaskId

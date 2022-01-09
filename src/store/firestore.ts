@@ -95,6 +95,9 @@ export function firestoreUserCollection<Item extends ObjectWithId>(
 
 			// Subscribe to remote changes so they're reflected locally
 			const snapshotUnsub = onSnapshot(reference, (snapshot) => {
+				console.log("snapshot says hi", performance.now());
+				console.log(snapshot.docChanges(), performance.now());
+				console.log(snapshot.metadata);
 				const oldValue = get(store);
 				const newValue = snapshot.docs.map((doc) =>
 					doc.data()
@@ -248,7 +251,7 @@ export function firestoreUserDocumentField<FieldValue>(
 					return `users/${get(loggedInUserId)}`;
 				}
 
-				return `users/${get(loggedInUserId)}/${documentPath}`
+				return `users/${get(loggedInUserId)}/${documentPath}`;
 			})();
 
 			const reference = doc(database, fullPath);
@@ -279,7 +282,10 @@ export function firestoreUserDocumentField<FieldValue>(
 				const oldValue = get(store);
 				const documentData = snapshot.data();
 
-				if (documentData !== undefined && !isEqual(documentData[fieldKey], oldValue)) {
+				if (
+					documentData !== undefined &&
+					!isEqual(documentData[fieldKey], oldValue)
+				) {
 					store.set(documentData[fieldKey]);
 				}
 			});
@@ -347,7 +353,9 @@ async function addDocumentToCollection(
 	reference: CollectionReference<DocumentData>,
 	document: ObjectWithId
 ) {
+	console.log("start setDoc", performance.now());
 	await setDoc(doc(reference, document.id), document);
+	console.log("end setDoc", performance.now());
 }
 
 async function patchDocumentInCollection(
@@ -355,14 +363,18 @@ async function patchDocumentInCollection(
 	id: string,
 	newValue: any
 ) {
+	console.log("start updateDoc", performance.now());
 	await updateDoc(doc(reference, id), newValue);
+	console.log("end updateDoc", performance.now());
 }
 
 async function removeDocumentFromCollection(
 	reference: CollectionReference<DocumentData>,
 	id: string
 ) {
-	deleteDoc(doc(reference, id));
+	console.log("start deleteDoc", performance.now());
+	await deleteDoc(doc(reference, id));
+	console.log("end deleteDoc", performance.now());
 }
 
 /**
