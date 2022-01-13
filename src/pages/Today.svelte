@@ -1,4 +1,5 @@
 <script lang="ts">
+	import TagSelect from "../components/TagSelect.svelte";
 	import TaskList from "../components/TaskList.svelte";
 	import Page from "../layouts/Page.svelte";
 	import {
@@ -7,6 +8,7 @@
 		selectedTaskId,
 		tasksForToday,
 	} from "../store/tasks";
+	import unique from "../utilities/unique";
 
 	let actions = [
 		{
@@ -14,6 +16,24 @@
 			callback: addTaskHere,
 		},
 	];
+
+	let filteringByTag = null;
+
+	$: tagsOfTasks = unique(
+		$tasksForToday.reduce((tags, task) => {
+			return [...tags, ...task.tags];
+		}, [])
+	);
+
+	$: filteredTasks = $tasksForToday.filter((task) => {
+		if (filteringByTag === null) {
+			return task;
+		}
+
+		return task.tags.some((tag) => {
+			return filteringByTag === tag;
+		});
+	});
 
 	function addTaskHere() {
 		const newTask = createTask({
@@ -30,8 +50,12 @@
 	<h1>Today</h1>
 	{$tasksForToday.length} items
 
+	{#if tagsOfTasks.length}
+		<TagSelect tags={tagsOfTasks} bind:selected={filteringByTag} />
+	{/if}
+
 	{#if $tasksForToday.length > 0}
-		<TaskList tasks={$tasksForToday} />
+		<TaskList tasks={filteredTasks} />
 	{:else}
 		<p>Looks like you're done for today. Enjoy!</p>
 	{/if}
