@@ -6,9 +6,20 @@
 	import { inProgressTasks, isTaskForToday, Task } from "../store/tasks";
 	import { getTagsSortedByCount } from "../store/tags";
 
+	$: upcomingTasks = $inProgressTasks.filter((task) => {
+		if (
+			task.due === null &&
+			(task.deferType !== "date" || task.deferredTo === null)
+		) {
+			return false;
+		}
+
+		return true;
+	});
+
 	let filteringByTag = null;
-	$: tagsOfTasks = getTagsSortedByCount($inProgressTasks);
-	$: filteredTasks = $inProgressTasks.filter((task) => {
+	$: tagsOfTasks = getTagsSortedByCount(upcomingTasks);
+	$: filteredTasks = upcomingTasks.filter((task) => {
 		if (filteringByTag === null) {
 			return task;
 		}
