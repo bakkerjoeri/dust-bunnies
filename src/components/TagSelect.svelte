@@ -1,6 +1,4 @@
 <script lang="ts">
-	import VisuallyHidden from "./library/VisuallyHidden.svelte";
-
 	export let tags: string[];
 	export let selected: string;
 
@@ -14,16 +12,18 @@
 
 <ul>
 	{#each options as { value, text } (value)}
-		<li class="tag" class:is-selected={value === selected}>
-			<VisuallyHidden>
-				<input
-					type="radio"
-					id={`tag-picker-option-${value}`}
-					bind:group={selected}
-					{value}
-				/>
-			</VisuallyHidden>
-			<label for={`tag-picker-option-${value}`}>
+		<li>
+			<input
+				type="radio"
+				id={`tag-picker-option-${value}`}
+				bind:group={selected}
+				{value}
+			/>
+			<label
+				for={`tag-picker-option-${value}`}
+				class="tag"
+				class:is-selected={value === selected}
+			>
 				{text}
 			</label>
 		</li>
@@ -34,10 +34,12 @@
 	ul {
 		display: flex;
 		list-style: none;
+		margin-top: calc(var(--baseline) / 2);
+		margin-bottom: calc(var(--baseline) / 2);
 	}
 
 	li + li {
-		margin-left: 10px;
+		margin-left: 5px;
 	}
 
 	.tag {
@@ -56,10 +58,16 @@
 			border: 1px solid var(--background-color-ui-inverse);
 		}
 
-		&:hover:not(.is-selected),
-		&:focus-within:not(.is-selected) {
+		input:not(:checked) + &:hover:not(.is-selected),
+		input:focus:not(:checked) + & {
 			background-color: var(--border-color-ui-secondary);
 			border-color: var(--border-color-ui-secondary);
 		}
+	}
+
+	input[type="radio"] {
+		position: absolute;
+		opacity: 0;
+		pointer-events: none;
 	}
 </style>

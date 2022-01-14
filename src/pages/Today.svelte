@@ -8,7 +8,7 @@
 		selectedTaskId,
 		tasksForToday,
 	} from "../store/tasks";
-	import unique from "../utilities/unique";
+	import { getTagsSortedByCount } from "../store/tags";
 
 	let actions = [
 		{
@@ -18,13 +18,7 @@
 	];
 
 	let filteringByTag = null;
-
-	$: tagsOfTasks = unique(
-		$tasksForToday.reduce((tags, task) => {
-			return [...tags, ...task.tags];
-		}, [])
-	);
-
+	$: tagsOfTasks = getTagsSortedByCount($tasksForToday);
 	$: filteredTasks = $tasksForToday.filter((task) => {
 		if (filteringByTag === null) {
 			return task;
