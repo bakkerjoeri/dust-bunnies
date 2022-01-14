@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fuzzyFutureDifference } from "../utilities/dates";
 	import {
 		addSubtask,
 		createTask,
@@ -8,7 +7,7 @@
 		Task,
 		tasks,
 	} from "./../store/tasks";
-import DueLabel from "./DueLabel.svelte";
+	import DueLabel from "./DueLabel.svelte";
 	import TaskList from "./TaskList.svelte";
 
 	export let task: Task;
@@ -210,13 +209,21 @@ import DueLabel from "./DueLabel.svelte";
 
 	{#if task.status === "inProgress" && task.due !== null}
 		<div class="due">
-			<DueLabel due={task.due}/>
+			<DueLabel due={task.due} />
 		</div>
 	{/if}
 
 	<div class="options">
 		<button on:click={onClickAddSubtask}>Add subtask</button>
 	</div>
+
+	{#if task.tags.length > 0}
+		<ul class="tags">
+			{#each task.tags as tag}
+				<li>{tag}</li>
+			{/each}
+		</ul>
+	{/if}
 </div>
 
 {#if subtasks.length > 0 && areSubtasksVisible}
@@ -229,6 +236,7 @@ import DueLabel from "./DueLabel.svelte";
 	.task {
 		display: grid;
 		grid-template-columns: 26px 26px 1fr max-content max-content;
+		grid-template-rows: min-content min-content;
 
 		&.is-selected {
 			background-color: rgb(213, 238, 255);
@@ -267,6 +275,18 @@ import DueLabel from "./DueLabel.svelte";
 
 	.options {
 		grid-column: 5 / 6;
+	}
+
+	.tags {
+		grid-column: 3 / 4;
+		grid-row: 2 / 3;
+		display: flex;
+		list-style: none;
+		color: var(--color-text-soft);
+		font-size: var(--font-size-small);
+		* + * {
+			margin-left: 10px;
+		}
 	}
 
 	.subtasks {

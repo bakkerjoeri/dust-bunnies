@@ -1,5 +1,6 @@
 <script lang="ts">
 	import TaskList from "../components/TaskList.svelte";
+	import TagSelect from "../components/TagSelect.svelte";
 	import Page from "../layouts/Page.svelte";
 	import {
 		addTask,
@@ -7,6 +8,19 @@
 		selectedTaskId,
 		tasksForSomeday,
 	} from "../store/tasks";
+	import { getTagsSortedByCount } from "../store/tags";
+
+	let filteringByTag = null;
+	$: tagsOfTasks = getTagsSortedByCount($tasksForSomeday);
+	$: filteredTasks = $tasksForSomeday.filter((task) => {
+		if (filteringByTag === null) {
+			return task;
+		}
+
+		return task.tags.some((tag) => {
+			return filteringByTag === tag;
+		});
+	});
 
 	let actions = [
 		{
@@ -29,7 +43,11 @@
 	<h1>Someday</h1>
 	{$tasksForSomeday.length} items
 
-	{#if $tasksForSomeday.length > 0}
-		<TaskList tasks={$tasksForSomeday} />
+	{#if tagsOfTasks.length}
+		<TagSelect tags={tagsOfTasks} bind:selected={filteringByTag} />
+	{/if}
+
+	{#if filteredTasks.length > 0}
+		<TaskList tasks={filteredTasks} />
 	{/if}
 </Page>

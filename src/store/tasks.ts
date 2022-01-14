@@ -198,19 +198,7 @@ export const inbox = derived([activeTasks], ([activeTasks]) => {
 });
 
 export const tasksForToday = derived([activeTasks], ([activeTasks]) => {
-	return activeTasks.filter((task) => {
-		const isTaskInProgress = task.status === "inProgress";
-		const isTaskDeferredToToday =
-			task.deferType === "date" &&
-			task.deferredTo !== null &&
-			dayjs(task.deferredTo).isSameOrBefore(dayjs(new Date(), "day"));
-
-		const isTaskDueToday =
-			task.due !== null &&
-			dayjs(task.due).isSameOrBefore(dayjs(new Date(), "day"));
-
-		return isTaskInProgress && (isTaskDeferredToToday || isTaskDueToday);
-	});
+	return activeTasks.filter(isTaskForToday);
 });
 
 export const tasksForSomeday = derived(
@@ -225,3 +213,17 @@ export const tasksInLogbook = derived([activeTasks], ([activeTasks]) => {
 		return task.status === "done" || task.status === "dropped";
 	});
 });
+
+export function isTaskForToday(task: Task): boolean {
+	const isTaskInProgress = task.status === "inProgress";
+	const isTaskDeferredToToday =
+		task.deferType === "date" &&
+		task.deferredTo !== null &&
+		dayjs(task.deferredTo).isSameOrBefore(dayjs(new Date(), "day"));
+
+	const isTaskDueToday =
+		task.due !== null &&
+		dayjs(task.due).isSameOrBefore(dayjs(new Date(), "day"));
+
+	return isTaskInProgress && (isTaskDeferredToToday || isTaskDueToday);
+}
