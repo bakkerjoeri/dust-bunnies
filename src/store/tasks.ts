@@ -126,6 +126,11 @@ export function addSubtask(parentTaskId: Task["id"], subtask: Task) {
 }
 
 export function deleteTask(taskId: Task["id"]) {
+	// Remove from selectedTaskId
+	if (get(selectedTaskId) === taskId) {
+		selectedTaskId.set(null);
+	}
+
 	tasks.update((tasks) => {
 		return (
 			tasks
@@ -144,11 +149,6 @@ export function deleteTask(taskId: Task["id"]) {
 				})
 		);
 	});
-
-	// Remove from selectedTaskId
-	if (get(selectedTaskId) === taskId) {
-		selectedTaskId.set(null);
-	}
 }
 
 export const rootTasks = derived([tasks], ([tasks]) => {
