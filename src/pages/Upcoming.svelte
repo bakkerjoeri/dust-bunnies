@@ -57,7 +57,7 @@
 					return new Date().valueOf();
 				}
 
-				return task.deferredTo ? task.deferredTo : task.due;
+				return task.deferType === "date" && task.deferredTo ? task.deferredTo : task.due;
 			})();
 
 			const datestring = dayjs(date).format("YYYY-MM-DD");
