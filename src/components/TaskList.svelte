@@ -6,7 +6,7 @@
 </script>
 
 <ul>
-	{#each tasks as task}
+	{#each tasks as task (task.id)}
 		<li>
 			<TaskItem {task} />
 		</li>

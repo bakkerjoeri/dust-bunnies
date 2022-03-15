@@ -57,10 +57,15 @@
 		titleDraft = task.title;
 	}
 
-	function onClickCheckbox() {
+	function onClickCheckbox(event) {
 		if (task.status === "done" || task.status === "dropped") {
+			event.target.checked = false;
+			event.target.indeterminate = false;
+
 			patchTask(task.id, { status: "inProgress" });
 		} else {
+			event.target.checked = true;
+			event.target.indeterminate = false;
 			patchTask(task.id, { status: "done" });
 		}
 	}
@@ -180,7 +185,7 @@
 		type="checkbox"
 		checked={task.status === "done"}
 		indeterminate={task.status === "dropped"}
-		on:click|preventDefault={onClickCheckbox}
+		on:click={onClickCheckbox}
 	/>
 
 	<div
