@@ -22,7 +22,7 @@
 	<h1>Inbox</h1>
 	{$inbox.length} items
 
-	{#if tagsOfTasks.length}
+	{#if tagsOfTasks.length || filteringByTag}
 		<TagSelect tags={tagsOfTasks} bind:selected={filteringByTag} />
 	{/if}
 

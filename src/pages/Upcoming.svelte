@@ -112,7 +112,7 @@
 <Page>
 	<h1>Upcoming</h1>
 
-	{#if tagsOfTasks.length}
+	{#if tagsOfTasks.length || filteringByTag}
 		<TagSelect tags={tagsOfTasks} bind:selected={filteringByTag} />
 	{/if}
 
