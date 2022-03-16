@@ -6,6 +6,7 @@ import { localStore } from "./localStore";
 import type { Readable } from "svelte/store";
 import { database } from "./../utilities/firebase";
 import { firestoreUserCollection } from "./firestore";
+import { time } from "./time";
 
 export interface Task {
 	id: string;
@@ -197,9 +198,12 @@ export const inbox = derived([activeTasks], ([activeTasks]) => {
 	});
 });
 
-export const tasksForToday = derived([activeTasks], ([activeTasks]) => {
-	return activeTasks.filter(isTaskForToday);
-});
+export const tasksForToday = derived(
+	[activeTasks, time],
+	([activeTasks, time]) => {
+		return activeTasks.filter((task) => isTaskForToday(task, time));
+	}
+);
 
 export const tasksForSomeday = derived(
 	[inProgressTasks],
@@ -214,16 +218,15 @@ export const tasksInLogbook = derived([activeTasks], ([activeTasks]) => {
 	});
 });
 
-export function isTaskForToday(task: Task): boolean {
+export function isTaskForToday(task: Task, now: number): boolean {
 	const isTaskInProgress = task.status === "inProgress";
 	const isTaskDeferredToToday =
 		task.deferType === "date" &&
 		task.deferredTo !== null &&
-		dayjs(task.deferredTo).isSameOrBefore(dayjs(new Date(), "day"));
+		dayjs(task.deferredTo).isSameOrBefore(dayjs(now, "day"));
 
 	const isTaskDueToday =
-		task.due !== null &&
-		dayjs(task.due).isSameOrBefore(dayjs(new Date(), "day"));
+		task.due !== null && dayjs(task.due).isSameOrBefore(dayjs(now, "day"));
 
 	return isTaskInProgress && (isTaskDeferredToToday || isTaskDueToday);
 }

@@ -5,6 +5,7 @@
 	import Page from "../layouts/Page.svelte";
 	import { inProgressTasks, isTaskForToday, Task } from "../store/tasks";
 	import { getTagsSortedByCount } from "../store/tags";
+	import { time } from "src/store/time";
 
 	$: upcomingTasks = $inProgressTasks.filter((task) => {
 		if (
@@ -53,11 +54,13 @@
 			}
 
 			const date = (() => {
-				if (isTaskForToday(task)) {
+				if (isTaskForToday(task, $time)) {
 					return new Date().valueOf();
 				}
 
-				return task.deferType === "date" && task.deferredTo ? task.deferredTo : task.due;
+				return task.deferType === "date" && task.deferredTo
+					? task.deferredTo
+					: task.due;
 			})();
 
 			const datestring = dayjs(date).format("YYYY-MM-DD");

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import dayjs from "dayjs";
+	import { time } from "src/store/time";
 
 	export let due: number;
 
-	$: isDue = dayjs(due).isToday() || dayjs(due).diff(dayjs(), "day") <= 0; 
+	$: isDue = dayjs(due).isToday() || dayjs(due).diff(dayjs(), "day") <= 0;
 	$: label = (() => {
-		const now = dayjs();
+		const now = dayjs($time);
 		const then = dayjs(due);
 		const differenceInYears = then.diff(now, "year");
 
@@ -45,10 +46,11 @@
 			return "overdue";
 		}
 
-		return `in ${differenceInDays} ${differenceInDays === 1 ? "day" : "days"}`;
+		return `in ${differenceInDays} ${
+			differenceInDays === 1 ? "day" : "days"
+		}`;
 	})();
 </script>
-
 
 <span class="due" class:is-due={isDue}>
 	{#if isDue}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import dayjs from "dayjs";
+	import { time } from "src/store/time";
 
 	import TaskList from "../components/TaskList.svelte";
 	import Page from "../layouts/Page.svelte";
@@ -54,7 +55,7 @@
 	}
 
 	function getDateHeader(date: number | string): string {
-		const now = dayjs();
+		const now = dayjs($time);
 		const then = dayjs(date);
 
 		if (then.isToday()) {
