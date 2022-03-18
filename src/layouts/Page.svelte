@@ -12,7 +12,7 @@
 	import Button from "../components/library/Button.svelte";
 	import { isPhabletUp, isTabletUp } from "../store/mediaquery";
 	import Modal from "../components/library/Modal.svelte";
-	import { get, writable } from "svelte/store";
+	import { get } from "svelte/store";
 	import ActionRow from "../components/library/ActionRow.svelte";
 	import Navigation from "../components/Navigation.svelte";
 	import { isNavigationOpen } from "../store/ui";
@@ -159,11 +159,15 @@
 	header {
 		grid-column: 1 / -1;
 		grid-row: 1 / 2;
+		position: sticky;
+		top: 0;
+		z-index: 1;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		padding: 0 var(--baseline);
 		border-bottom: 1px solid var(--border-color-ui-secondary);
+		background-color: var(--background-color-ui-secondary);
 	}
 
 	main {
@@ -185,7 +189,8 @@
 	aside {
 		position: sticky;
 		overflow: scroll;
-		top: calc(1 * var(--baseline));
+		top: calc(2 * var(--baseline));
 		height: calc(100vh - 2 * var(--baseline));
+		background-color: var(--background-color-ui-secondary);
 	}
 </style>
