@@ -39,12 +39,7 @@
 
 <form on:submit|preventDefault={save}>
 	<FormItem label="Title" let:id>
-		<InputText
-			type="text"
-			bind:value={title}
-			{id}
-			autofocus={title === ""}
-		/>
+		<InputText type="text" bind:value={title} {id} />
 	</FormItem>
 
 	<FormItem label="Status">
