@@ -1,6 +1,6 @@
 <script lang="ts">
 	import dayjs from "dayjs";
-	import { time } from "src/store/time";
+	import { time } from "./../store/time";
 
 	export let due: number;
 

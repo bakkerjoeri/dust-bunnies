@@ -1,6 +1,6 @@
 <script lang="ts">
 	import dayjs from "dayjs";
-	import { time } from "src/store/time";
+	import { time } from "./../store/time";
 
 	import TaskList from "../components/TaskList.svelte";
 	import Page from "../layouts/Page.svelte";

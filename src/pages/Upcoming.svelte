@@ -5,7 +5,7 @@
 	import Page from "../layouts/Page.svelte";
 	import { inProgressTasks, isTaskForToday, Task } from "../store/tasks";
 	import { getTagsSortedByCount } from "../store/tags";
-	import { time } from "src/store/time";
+	import { time } from "./../store/time";
 
 	$: upcomingTasks = $inProgressTasks.filter((task) => {
 		if (
