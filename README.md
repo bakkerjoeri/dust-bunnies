@@ -1,6 +1,3 @@
 # Dust bunnies
 
-A tiny todo app.
-
-- Very much Work In Progress.
-- Data is saved locally.
+A tiny todo app that is very much Work In Progress. Data is saved locally or via Google Firebase
