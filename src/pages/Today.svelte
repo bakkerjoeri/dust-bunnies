@@ -33,6 +33,7 @@
 		const newTask = createTask({
 			deferType: "date",
 			deferredTo: new Date().valueOf(),
+			tags: filteringByTag ? [filteringByTag] : [],
 		});
 
 		addTask(newTask);

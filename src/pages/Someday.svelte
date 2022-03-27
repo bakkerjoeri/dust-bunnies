@@ -26,6 +26,7 @@
 		{
 			label: "Add here",
 			callback: addTaskHere,
+			tags: filteringByTag ? [filteringByTag] : [],
 		},
 	];
 
