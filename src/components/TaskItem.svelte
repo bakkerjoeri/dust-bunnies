@@ -266,6 +266,8 @@
 	.title {
 		grid-column: 3 / 4;
 		line-height: var(--baseline);
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.placeholder {
