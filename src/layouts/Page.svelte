@@ -188,7 +188,7 @@
 	.navigation,
 	aside {
 		position: sticky;
-		overflow: scroll;
+		overflow: auto;
 		top: calc(2 * var(--baseline));
 		height: calc(100vh - 2 * var(--baseline));
 		background-color: var(--background-color-ui-secondary);
