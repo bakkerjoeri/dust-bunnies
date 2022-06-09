@@ -132,23 +132,27 @@ export function deleteTask(taskId: Task["id"]) {
 		selectedTaskId.set(null);
 	}
 
+	// Delete any of its subtasks
+	const task = findTask(taskId);
+	task.subtaskIds.forEach(deleteTask);
+
+	// Remove from any task's subtask list
 	tasks.update((tasks) => {
-		return (
-			tasks
-				// Delete the task itself
-				.filter((task) => {
-					return task.id !== taskId;
-				})
-				// Remove it from any task's subtasks
-				.map((task) => {
-					return {
-						...task,
-						subtaskIds: task.subtaskIds.filter(
-							(subtaskId) => subtaskId !== taskId
-						),
-					};
-				})
-		);
+		return tasks.map((task) => {
+			return {
+				...task,
+				subtaskIds: task.subtaskIds.filter(
+					(subtaskId) => subtaskId !== taskId
+				),
+			};
+		});
+	});
+
+	// Delete the task itself
+	tasks.update((tasks) => {
+		return tasks.filter((task) => {
+			return task.id !== taskId;
+		});
 	});
 }
 
