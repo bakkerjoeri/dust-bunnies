@@ -35,10 +35,6 @@
 	.label {
 		display: block;
 		line-height: var(--baseline);
-
-		&[for] {
-			cursor: pointer;
-		}
 	}
 
 	.description {

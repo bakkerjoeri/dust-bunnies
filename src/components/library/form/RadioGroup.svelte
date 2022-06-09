@@ -26,12 +26,7 @@
 {/each}
 
 <style lang="scss">
-	input {
-		cursor: pointer;
-	}
-
 	label {
-		cursor: pointer;
 		line-height: var(--baseline);
 	}
 </style>

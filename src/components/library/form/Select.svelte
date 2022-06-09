@@ -40,7 +40,6 @@
 		--select-height: var(--baseline);
 		--select-font-size: var(--font-size-body);
 
-		cursor: pointer;
 		-webkit-appearance: none;
 		-moz-appearance: none;
 		appearance: none;

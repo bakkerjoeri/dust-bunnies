@@ -29,10 +29,6 @@
 		border: 0;
 		background-color: transparent;
 		color: var(--color-text);
-
-		&:not(:disabled) {
-			cursor: pointer;
-		}
 	}
 
 	.variant-outline {
