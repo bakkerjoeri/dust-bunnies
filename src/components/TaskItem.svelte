@@ -18,9 +18,10 @@
 	let titleInput: HTMLInputElement;
 
 	$: isSelected = $selectedTaskId === task.id;
-	$: subtasks = task.subtaskIds.map((id) =>
-		$tasks.find((task) => task.id === id)
-	);
+	$: subtasks = task.subtaskIds
+		.map((id) => $tasks.find((task) => task.id === id))
+		// This filter is necessary to prevent crashes on subtasks that were deleted this frame but still rendering. TODO Ideally this should be solved on the store level instead.
+		.filter((task) => !!task);
 
 	$: if (isEditing && $selectedTaskId !== task.id) {
 		saveChangesToTitle();
