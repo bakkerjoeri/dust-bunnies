@@ -12,3 +12,11 @@ html {
 	background-color: var(--background-color-ui-primary);
 	color: var(--color-text);
 }
+
+h1 {
+	line-height: calc(2 * var(--baseline));
+}
+
+p {
+	line-height: var(--baseline);
+}
