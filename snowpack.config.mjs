@@ -11,8 +11,15 @@ export default {
 			dest: "/index.html",
 		},
 	],
-	plugins: ["@snowpack/plugin-dotenv", "@snowpack/plugin-svelte", "@snowpack/plugin-typescript"],
+	plugins: [
+		"@snowpack/plugin-dotenv",
+		"@snowpack/plugin-svelte",
+		"@snowpack/plugin-typescript",
+	],
 	packageOptions: {
 		knownEntrypoints: ["svelte"],
+	},
+	optimize: {
+		minify: true,
 	},
 };
