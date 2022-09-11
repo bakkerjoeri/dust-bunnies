@@ -66,8 +66,6 @@
 	}
 
 	input[type="radio"] {
-		position: absolute;
-		opacity: 0;
-		pointer-events: none;
+		display: none;
 	}
 </style>
