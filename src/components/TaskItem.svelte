@@ -189,7 +189,7 @@
 		on:click={onClickCheckbox}
 	/>
 
-	<div
+	<button
 		class="title"
 		class:is-placeholder={task.title.length === 0}
 		on:click={onClickTask}
@@ -200,6 +200,7 @@
 					type="text"
 					bind:value={titleDraft}
 					bind:this={titleInput}
+					class="title-input"
 				/>
 			</form>
 		{:else}
@@ -211,7 +212,7 @@
 				{/if}
 			</label>
 		{/if}
-	</div>
+	</button>
 
 	{#if task.status === "inProgress" && task.due !== null}
 		<div class="due">
@@ -269,6 +270,16 @@
 		line-height: var(--baseline);
 		overflow: hidden;
 		text-overflow: ellipsis;
+		background-color: transparent;
+		text-align: left;
+		font: inherit;
+		border: 0;
+	}
+
+	.title-input {
+		font: inherit;
+		border: 0;
+		border-bottom: 1px solid var(--border-color-ui-secondary);
 	}
 
 	.placeholder {
