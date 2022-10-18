@@ -273,6 +273,7 @@
 		background-color: transparent;
 		text-align: left;
 		font: inherit;
+		color: inherit;
 		border: 0;
 	}
 
