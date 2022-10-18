@@ -281,6 +281,7 @@
 		font: inherit;
 		border: 0;
 		border-bottom: 1px solid var(--border-color-ui-secondary);
+		width: 100%;
 	}
 
 	.placeholder {
