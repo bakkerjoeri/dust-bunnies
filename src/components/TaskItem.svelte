@@ -246,7 +246,7 @@
 		grid-template-rows: min-content min-content;
 
 		&.is-selected {
-			background-color: rgb(213, 238, 255);
+			background-color: var(--background-color-ui-highlight);
 		}
 	}
 
