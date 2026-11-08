@@ -33,13 +33,11 @@
 <style lang="scss">
 	ul {
 		display: flex;
+		flex-wrap: wrap;
 		list-style: none;
 		margin-top: calc(var(--baseline) / 2);
 		margin-bottom: calc(var(--baseline) / 2);
-	}
-
-	li + li {
-		margin-left: 5px;
+		gap: 5px;
 	}
 
 	.tag {
