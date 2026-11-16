@@ -1,13 +1,16 @@
 {
-	"include": ["src", "types"],
+	"extends": "$app/tsconfig",
 	"compilerOptions": {
-		"module": "esnext",
-		"target": "esnext",
-		"moduleResolution": "node",
-		"jsx": "preserve",
-		"baseUrl": "./",
-		"noEmit": true,
-		"allowJs": true,
-		"allowSyntheticDefaultImports": true
-	}
+		"strict": true,
+		"types": [
+			"$app/types",
+			"node"
+		]
+	},
+	"include": [
+		"src",
+		"vite.config.ts",
+		"prettier.config.js",
+		"eslint.config.js"
+	]
 }
